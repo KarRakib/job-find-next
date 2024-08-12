@@ -1,99 +1,66 @@
-'use client'
-import { IconDefinition } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { Button } from '@radix-ui/themes'
-import axios from 'axios'
-import React, { ChangeEvent, FormEvent, useRef } from 'react'
+'use client';
+import { faSpinner, IconDefinition } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Button } from '@radix-ui/themes';
+import Image from 'next/image';
+import React, { ChangeEvent, useRef, useState } from 'react';
 
-const ImageUpload = ({ name, icon, defaultValue = '' }:
-    { icon: IconDefinition, name: string, defaultValue: string }) => {
-    const fileInRef = useRef<HTMLInputElement>(null)
-    const upload = async (e: ChangeEvent) => {
+const ImageUpload = ({ name, icon, defaultValue = '' }: { icon: IconDefinition, name: string, defaultValue: string }) => {
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [isUploading, setIsUploading] = useState(false);
+    const [isImageLoading, setIsImageLoading] = useState(false);
+    const [url, setUrl] = useState<string>('');
+
+    const upload = async (e: ChangeEvent<HTMLInputElement>) => {
         const input = e.target as HTMLInputElement;
-        console.log('input', input);
 
         if (input && input.files?.length && input.files.length > 0) {
+            setIsUploading(true)
             const file = input.files[0];
-            const data = new FormData;
-            data.set('file', file);
+            const formData = new FormData();
+            formData.append('file', file);
 
-            const files = data.get('file')
-            console.log(file);
-            console.log(files);
+            try {
+                const res = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData,
+                });
 
-            // const res = await axios.post('/api/upload', files,{
-            //     headers:{
-            //         'Content-Type':'multipart/form-data'
-            //     }
-            // })
-            // console.log(res);
-            const res = await fetch('/api/upload',{
-                method:'POST',
-                body: files,
-            })
-            const img = res.json()
-            console.log(img);
-            
-
-
-        }
-
-    }
-    const [image, setImage] = React.useState<File | null>(null);
-    const [url, setUrl] = React.useState<string>('');
-
-    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-        console.log(e.target.value);
-
-        if (e.target.files && e.target.files.length > 0) {
-            setImage(e.target.files[0]);
-            console.log('image', image);
-
+                const result = await res.json();
+                setUrl(result.url);
+                setIsUploading(false)
+                setIsImageLoading(true)
+                console.log('Uploaded image URL:', result.url);
+            } catch (error) {
+                console.error('Error uploading file:', error);
+            }
         }
     };
-
-    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-
-        if (image) {
-            console.log(image);
-
-            const reader = new FileReader();
-            reader.readAsDataURL(image);
-            reader.onloadend = async () => {
-                const base64String = reader.result as string;
-
-                // try {
-                //     const res = await axios.post<{ url: string }>('/api/upload', { file: base64String }, {
-                //         headers: {
-                //             'Content-Type': 'application/json',
-                //         },
-                //     });
-
-                //     setUrl(res.data.url);
-                //     console.log('Upload response:', res.data);
-                // } catch (error: any) {
-                //     console.error('Error uploading file:', error.response ? error.response.data : error.message);
-                // }
-            };
-        }
-    };
+    const imgLoading = (isUploading || isImageLoading);
     return (
         <>
-            <div className='bg-gray-100 rounded-md size-24 inline-flex items-center content-center justify-center'>
-                <FontAwesomeIcon icon={icon} className='text-gray-400' />
+            <div className="bg-gray-100 rounded-md size-24 inline-flex items-center content-center justify-center">
+            {imgLoading && (
+          <FontAwesomeIcon icon={faSpinner} className="text-gray-400 animate-spin"/>
+        )}
+        {(!isUploading) && url && (
+          <Image src={url} alt={'uploaded image'} width={1024} height={1024}
+                 onLoadingComplete={() => setIsImageLoading(false)}
+                 className="w-auto h-auto max-w-24 max-h-24" />
+        )}
+        {!imgLoading && !url && (
+          <FontAwesomeIcon icon={icon} className="text-gray-400"/>
+        )}
             </div>
-            <div className='mt-2'>
-                <input onChange={(e) => upload(e)} ref={fileInRef} type="file" className="hidden" />
-                < Button onClick={() => fileInRef.current?.click()} type='button' variant='soft' >
-                    select file
+            <div className="mt-2">
+                <input onChange={upload} ref={fileInputRef} type="file" className="hidden" />
+                <Button onClick={() => fileInputRef.current?.click()} type="button" variant="soft">
+                    Select file
                 </Button>
-
             </div>
-
-
+           
         </>
-    )
-}
+    );
+};
 
-export default ImageUpload
+export default ImageUpload;
