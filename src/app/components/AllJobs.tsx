@@ -1,10 +1,11 @@
 
 
 
+import { Job } from "../models/Job";
 import JobRow from "./JobRow";
 
-export default function AllJobs() {
-    const jobs = [{}]
+export default function AllJobs({header,jobs}: {header:string, jobs:Job[]}) {
+
     
   return (
     <div className="bg-slate-200 py-6 rounded-3xl">
@@ -16,7 +17,7 @@ export default function AllJobs() {
             <div>No jobs found</div>
           )}
           {jobs && jobs.map(job => (
-            <JobRow  />
+            <JobRow jobDoc={job}  />
           ))}
         </div>
 

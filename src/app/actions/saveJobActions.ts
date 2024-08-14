@@ -5,6 +5,8 @@ import { JobModel } from "../models/Job";
 import { revalidatePath } from "next/cache";
 
 export const saveJobActions = async (formData: FormData) => {
+    console.log('formenterr', formData);
+    
     'use server'
     await mongoose.connect(process.env.MONGO_URL as string);
     const { id, ...jobData } = Object.fromEntries(formData);

@@ -2,7 +2,7 @@
 import { Button, RadioGroup, TextArea, TextField, Theme } from '@radix-ui/themes';
 import '@radix-ui/themes/styles.css';
 import React from 'react'
-import { Job } from '../models/Job';
+import type { Job } from '../models/Job';
 import {
    CitySelect,
    CountrySelect,
@@ -18,6 +18,7 @@ import ImageUpload from './ImageUpload';
 import { saveJobActions } from '../actions/saveJobActions';
 
 const JobForm = ({ orgId, jobDoc }: { orgId: string; jobDoc?: Job }) => {
+
    const [countryId, setCountryId] = React.useState(jobDoc?.countryId || 0);
    const [stateId, setStateId] = React.useState(jobDoc?.stateId || 0);
    const [cityId, setCityId] = React.useState(jobDoc?.cityId || null);
@@ -32,10 +33,23 @@ const JobForm = ({ orgId, jobDoc }: { orgId: string; jobDoc?: Job }) => {
       data.set('stateId', stateId.toString());
       data.set('cityId', cityId ? cityId.toString() : '');
       data.set('orgId', orgId);
-      const jobDoc = await saveJobActions(data);
-      redirect(`/jobs/${jobDoc.orgId}`);
+      const jobIcon = data.get('jobIcon') as string;
+      if (!jobIcon) {
+        data.set('jobIcon', jobDoc?.jobIcon || '');
+      }
+    
+      const contactPhoto = data.get('contactPhoto') as string;
+      if (!contactPhoto) {
+        data.set('contactPhoto', jobDoc?.contactPhoto || '');
+      }
+    
+      // Save the job document
+      const savedJobDoc = await saveJobActions(data);
+      redirect(`/jobs/${savedJobDoc.orgId}`);
    }
    console.log('ddddddd', FormData);
+ 
+   
 
 
    return (
@@ -117,13 +131,13 @@ const JobForm = ({ orgId, jobDoc }: { orgId: string; jobDoc?: Job }) => {
             <div className="sm:flex">
                <div className="w-1/3">
                   <h3>Job icon</h3>
-                  <ImageUpload name="jobIcon" icon={faStar} defaultValue={jobDoc?.jobIcon || ''} />
+                  <ImageUpload  name="jobIcon" icon={faStar} defaultValue={jobDoc?.jobIcon || ''} />
                </div>
                <div className="grow">
                   <h3>Contact person</h3>
                   <div className="flex gap-2">
                      <div className="">
-                        <ImageUpload name="contactPhoto" icon={faUser} defaultValue={jobDoc?.contactPhoto || ''} />
+                        <ImageUpload  name="contactPhoto" icon={faUser} defaultValue={jobDoc?.contactPhoto || ''} />
                      </div>
                      <div className="grow flex flex-col gap-1">
                         <TextField.Root
@@ -164,8 +178,8 @@ const JobForm = ({ orgId, jobDoc }: { orgId: string; jobDoc?: Job }) => {
                resize="vertical"
                name="description" />
             <div className="flex justify-center">
-               <Button size="3">
-                  <span className="px-8">Save</span>
+               <Button   size="3">
+                  <span  className="px-8 cursor-pointer">Save</span>
                </Button>
             </div>
          </form>

@@ -9,7 +9,7 @@ const ImageUpload = ({ name, icon, defaultValue = '' }: { icon: IconDefinition, 
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isUploading, setIsUploading] = useState(false);
     const [isImageLoading, setIsImageLoading] = useState(false);
-    const [url, setUrl] = useState<string>('');
+    const [url, setUrl] = React.useState(defaultValue);
 
     const upload = async (e: ChangeEvent<HTMLInputElement>) => {
         const input = e.target as HTMLInputElement;

@@ -4,8 +4,26 @@ import {faHeart} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import Link from "next/link";
+import type  { Job } from "../models/Job";
+import Timer from "./Timer";
 
-export default function JobRow() {
+export default function JobRow({jobDoc}:{jobDoc:Job}) {
+  const handleDelete = async(jobDoc:Job) =>{
+    console.log(jobDoc._id);
+    
+    if (jobDoc) {
+      try {
+        console.log('job-', jobDoc);
+        
+        await axios.delete('/api/jobs?id='+jobDoc._id);
+        window.location.reload();
+        
+      } catch (error) {
+        console.log(error);
+        
+      }
+    }
+  }
   return (
     <>
       <div className="bg-white p-4 rounded-lg shadow-sm relative">
@@ -14,19 +32,19 @@ export default function JobRow() {
         </div>
         <div className="flex grow gap-4">
           <div className="content-center w-12 basis-12 shrink-0">
-            {/* <img
+            <img
               className="size-12"
-              src={jobDoc?.jobIcon} alt=""/> */}
+              src={jobDoc?.jobIcon} alt=""/>
           </div>
           <div className="grow sm:flex">
             <div className="grow">
               <div>
-                {/* <Link href={`/jobs/${jobDoc.orgId}`} className="hover:underline text-gray-500 text-sm">{jobDoc.orgName || '?'}</Link> */}
+                <Link href={`/jobs/${jobDoc.orgId}`} className="hover:underline text-gray-500 text-sm">{jobDoc.orgName || '?'}</Link>
               </div>
               <div className="font-bold text-lg mb-1">
-                {/* <Link className="hover:underline" href={'/show/'+jobDoc._id}>{jobDoc.title}</Link> */}
+                <Link className="hover:underline" href={'/show/'+jobDoc._id}>{jobDoc.title}</Link>
               </div>
-              {/* <div className="text-gray-400 text-sm capitalize">
+              <div className="text-gray-400 text-sm capitalize">
                 {jobDoc.remote}
                 {' '}&middot;{' '}
                 {jobDoc.city}, {jobDoc.country}
@@ -39,21 +57,23 @@ export default function JobRow() {
                     {' '}&middot;{' '}
                     <button
                       type="button"
-                      onClick={async () => {
-                        await axios.delete('/api/jobs?id='+jobDoc._id);
-                        window.location.reload();
+                      onClick={ async() => {
+                        await axios.delete('/api/jobs?id='+jobDoc._id)
+                        // await axios.get('/api/jobs')
+                        window.location.reload()
                       }}>
+                      
                       Delete
                     </button>
                   </>
                 )}
-              </div> */}
-            </div>
-            {/* {jobDoc.createdAt && (
-              <div className="content-end text-gray-500 text-sm">
-                <TimeAgo createdAt={jobDoc.createdAt} />
               </div>
-            )} */}
+            </div>
+            {jobDoc.createdAt && (
+              <div className="content-end text-gray-500 text-sm">
+                <Timer createdAt={jobDoc.createdAt} />
+              </div>
+            )}
           </div>
         </div>
       </div>
