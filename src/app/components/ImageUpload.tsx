@@ -52,8 +52,9 @@ const ImageUpload = ({ name, icon, defaultValue = '' }: { icon: IconDefinition, 
           <FontAwesomeIcon icon={icon} className="text-gray-400"/>
         )}
             </div>
+            <input type="hidden" value={url} name={name} />
             <div className="mt-2">
-                <input onChange={upload} ref={fileInputRef} type="file" className="hidden" />
+                <input onChange={upload} ref={fileInputRef} type="file" className="hidden"  />
                 <Button onClick={() => fileInputRef.current?.click()} type="button" variant="soft">
                     Select file
                 </Button>

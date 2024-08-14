@@ -5,45 +5,37 @@ import { getUser } from '@workos-inc/authkit-nextjs';
 import Link from 'next/link';
 import React from 'react'
 import { WorkOS } from '@workos-inc/node'
-import { createCompany } from '../actions/workosActions';
 const page = async () => {
   const { user } = await getUser();
-  const workos = new WorkOS(process.env.WORKOS_API_KEY)
-  const hanldeData = async (data: FormData) => {
-    'use server'
-   if(user){
-    await createCompany(data.get('newCompanyName') as string, user?.id)
-   }
-  }
-
-  // console.log(workos);
-  // let organizationMemberships:AutoPaginatable<OrganizationMembership>={};
-
-  const organizationMemberships = await workos.userManagement.listOrganizationMemberships({
-    userId: user?.id,
-  });
-
-
-
-  if (!user) {
+  if (!user || !user.id) {
     return (
       <div className="container">
         <div>You need to be logged in to post a job</div>
       </div>
     );
   }
+  const workos = new WorkOS(process.env.WORKOS_API_KEY);
+  let organizationMemberships;
 
-  // const organizationMemberships = await workos.userManagement.listOrganizationMemberships({
-  //   userId: user.id,
-  // });
+  try {
+    organizationMemberships = await workos.userManagement.listOrganizationMemberships({
+      userId: user.id,
+    });
+  } catch (error) {
+    console.error('Error fetching organization memberships:', error);
+    return (
+      <div className="container">
+        <div>Failed to fetch organization memberships. Please try again later.</div>
+      </div>
+    );
+  }
 
-  const activeOrganizationMemberships = organizationMemberships.data.filter(om => om.status === 'active');
-  // console.log('active',activeOrganizationMemberships);
-  
-  const organizationsNames:{[key: string]: string} = {};
+  const activeOrganizationMemberships = organizationMemberships.data.filter(
+    om => om.status === 'active'
+  );
 
-  // console.log('organizationa', JSON.stringify(organizationsNames));
-  
+  const organizationsNames: { [key: string]: string } = {};
+
   for (const activeMembership of activeOrganizationMemberships) {
     const organization = await workos.organizations.getOrganization(activeMembership.organizationId);
     organizationsNames[organization.id] = organization.name;
