@@ -6,30 +6,38 @@ import axios from "axios";
 import Link from "next/link";
 import type  { Job } from "../models/Job";
 import Timer from "./Timer";
+import { useEffect, useState } from "react";
 
 export default function JobRow({jobDoc}:{jobDoc:Job}) {
-  const handleDelete = async(jobDoc:Job) =>{
-    console.log(jobDoc._id);
-    
-    if (jobDoc) {
-      try {
-        console.log('job-', jobDoc);
-        
-        await axios.delete('/api/jobs?id='+jobDoc._id);
-        window.location.reload();
-        
-      } catch (error) {
-        console.log(error);
-        
-      }
+  const [love, setLove] = useState(false)
+  useEffect(() => {
+    const favoritesLocal = JSON.parse(localStorage.getItem('favorites')) || [];
+    const isFavorite = favoritesLocal.some((item: { id: string }) => item.id === jobDoc?._id);
+    setLove(isFavorite);
+  }, [jobDoc?._id]);
+
+  const saveToFavorite = (id: string) => {
+    let loveSaveLocal = JSON.parse(localStorage.getItem('favorites') || '[]');
+    const itemIndex = loveSaveLocal.findIndex((item: { id: string }) => item.id === id);
+
+    if (itemIndex === -1) {
+      loveSaveLocal.push({ id });
+      setLove(true); // Set love to true when adding
+    } else {
+      loveSaveLocal.splice(itemIndex, 1);
+      setLove(false); // Set love to false when removing
     }
-  }
+
+    localStorage.setItem('favorites', JSON.stringify(loveSaveLocal));
+  };
+
+  
   return (
     <>
       <div className="bg-white p-4 rounded-lg shadow-sm relative">
         <div className="absolute cursor-pointer top-4 right-4">
-          <FontAwesomeIcon className="size-4 text-gray-300" icon={faHeart} />
-        </div>
+        <FontAwesomeIcon onClick={()=> saveToFavorite(jobDoc?._id)} className={`size-4 ${love? 'text-rose-600':'text-gray-300'}`} icon={faHeart} />
+          </div>
         <div className="flex grow gap-4">
           <div className="content-center w-12 basis-12 shrink-0">
             <img

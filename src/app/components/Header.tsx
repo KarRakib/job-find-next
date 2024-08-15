@@ -1,10 +1,10 @@
 
 import Link from "next/link";
-import {getSignInUrl,getSignUpUrl, getUser,signOut} from '@workos-inc/authkit-nextjs';
+import { getSignInUrl, getSignUpUrl, getUser, signOut } from '@workos-inc/authkit-nextjs';
 export default async function Header() {
 
-  const {user} = await getUser();
-  const signInUrl  = await getSignInUrl()
+  const { user } = await getUser();
+  const signInUrl = await getSignInUrl()
 
   return (
     <header>
@@ -17,14 +17,20 @@ export default async function Header() {
             </Link>
           )}
           {user && (
-            <form action={async () => {
-              'use server';
-              await signOut();
-            }}>
-              <button type="submit" className="rounded-md bg-gray-200 py-1 px-2 sm:py-2 sm:px-4">
-                Logout
-              </button>
-            </form>
+            <>
+
+              <form action={async () => {
+                'use server';
+                await signOut();
+              }}>
+                <button type="submit" className="rounded-md bg-gray-200 py-1 px-2 sm:py-2 sm:px-4">
+                  Logout
+                </button>
+              </form>
+              <Link className="rounded-md py-1 px-2 sm:py-2 sm:px-4 bg-rose-600 text-white" href={'/favorites'}>
+                Favorites
+              </Link>
+            </>
           )}
           <Link className="rounded-md py-1 px-2 sm:py-2 sm:px-4 bg-blue-600 text-white" href={'/add-job'}>
             Post a job

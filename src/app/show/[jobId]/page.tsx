@@ -1,17 +1,53 @@
-
+'use client'
+import AppliedPopUp from "@/app/components/AppliedPopUp";
 import { JobModel } from "@/app/models/Job";
+import { Button, Dialog } from "@radix-ui/themes";
+import axios from "axios";
+
 import mongoose from "mongoose";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 
-type PageProps={
-    params:{
-        jobId :string
-    }
+type PageProps = {
+  params: {
+    jobId: string
+  }
 }
-export default async function SingleJobPage(props:PageProps) {
+export default  function SingleJobPage(props: PageProps) {
   const jobId = props.params.jobId;
-  await mongoose.connect(process.env.MONGO_URL as string);
-  const jobDoc = await JobModel.findById(jobId);
+  const [jobDoc, setJobDoc] = useState([])
+  const [open, setOpen] = useState(false)
+  useEffect(() => {
+    const fetchData = () => {
+      try {
+        fetch(('/api/jobs?id=' + jobId))
+          .then(res => res.json())
+          .then(data => setJobDoc(data)
+          )
+
+
+      } catch (error) {
+        console.log('jobDoc Fetching', error);
+
+      }
+    }
+    fetchData()
+  }, [])
+
+  // await mongoose.connect(process.env.MONGO_URL as string);
+  // const jobDoc = await JobModel.findById(jobId);
+
+  const handlePopUp = () =>{
+setOpen(open)
+console.log('ip',open);
+
+  }
+
+  const handleApllied = (id: string) => {
+console.log(id);
+
+  }
+
   return (
     <div className="container mt-8 my-6">
       <div className="sm:flex">
@@ -25,6 +61,7 @@ export default async function SingleJobPage(props:PageProps) {
             {jobDoc.type}-time
           </div>
         </div>
+
         <div>
           <Image
             src={jobDoc?.jobIcon} alt={'job icon'}
@@ -51,6 +88,15 @@ export default async function SingleJobPage(props:PageProps) {
             Phone: {jobDoc.contactPhone}
           </div>
         </div>
+
+      </div>
+      <div className="flex justify-center">
+        <button onClick={() =>{ 
+          handleApllied(jobDoc._id);
+          handlePopUp() } } className="rounded-md py-1 px-2 cursor-pointer sm:py-2 sm:px-4 bg-blue-600 text-white">
+       Apply
+        </button>
+        <AppliedPopUp open={open} setOpen={setOpen} ></AppliedPopUp>
       </div>
     </div>
   );
