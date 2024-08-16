@@ -36,7 +36,7 @@ export default function JobRow({jobDoc,email}:{jobDoc:Job, email:string}) {
     <>
       <div className="bg-white p-4 rounded-lg shadow-sm relative">
         <div className="absolute cursor-pointer top-4 right-4">
-      {!jobDoc.isAdmin &&   <FontAwesomeIcon onClick={()=> saveToFavorite(jobDoc?._id)} className={`size-4 ${love? 'text-rose-600':'text-gray-300'}`} icon={faHeart} /> }
+      {!jobDoc.isAdmin && email &&   <FontAwesomeIcon onClick={()=> saveToFavorite(jobDoc?._id)} className={`size-4 ${love? 'text-rose-600':'text-gray-300'}`} icon={faHeart} /> }
           </div>
         <div className="flex grow gap-4">
           <div className="content-center w-12 basis-12 shrink-0">
