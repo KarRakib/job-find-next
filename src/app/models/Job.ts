@@ -39,6 +39,7 @@ const JobSchema = new Schema({
   stateId: {type: String, required: true},
   cityId: {type: String, required: false},
   jobIcon: {type: String},
+  applicated:[{}],
   contactPhoto: {type: String},
   contactName: {type: String, required: true},
   contactPhone: {type: String, required: true},

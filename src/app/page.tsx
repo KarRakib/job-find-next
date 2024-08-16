@@ -13,10 +13,12 @@ export default async function Home() {
     await JobModel.find({},{},{limit:5,sort:'-createdAt'}),
     user,
   );
+  console.log('home', user);
+  
   return (
     <>
     <Hero/>
-    <AllJobs header={''} jobs={latestJobs} />
+    <AllJobs user={user} header={''} jobs={latestJobs} />
     </>
   );
 }

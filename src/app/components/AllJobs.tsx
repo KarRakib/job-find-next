@@ -4,9 +4,10 @@
 import { Job } from "../models/Job";
 import JobRow from "./JobRow";
 
-export default function AllJobs({header,jobs}: {header:string, jobs:Job[]}) {
+export default function AllJobs({header,jobs,user}: {header:string, user:{}, jobs:Job[]}) {
 
-    
+const userEmail = user?.email
+console.log('all Jobs page = ', userEmail);
   return (
     <div className="bg-slate-200 py-6 rounded-3xl">
       <div className="container">
@@ -17,7 +18,7 @@ export default function AllJobs({header,jobs}: {header:string, jobs:Job[]}) {
             <div>No jobs found</div>
           )}
           {jobs && jobs.map(job => (
-            <JobRow jobDoc={job}  />
+            <JobRow email={userEmail} jobDoc={job}  />
           ))}
         </div>
 
